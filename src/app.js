@@ -3,8 +3,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware для логгирования запросов
+const logger = require('./logger');
+
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  logger.log(`${req.method} ${req.path}`);
   next();
 });
 
