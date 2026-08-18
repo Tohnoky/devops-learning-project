@@ -1,0 +1,58 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test and Lint
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm test
+      
+      - name: Check code style (опционально)
+        run: |
+          npm install -g eslint
+          eslint src/ || echo "ESLint warnings (not blocking)"
+
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: test                    # Запустится только если test прошёл
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build Docker image
+        run: |
+          docker build -t devops-app:${{ github.sha }} .
+          docker build -t devops-app:latest .
+      
+      - name: Test Docker image
+        run: |
+          docker run -d --name test-app -p 3000:3000 devops-app:latest
+          sleep 5
+          curl -f http://localhost:3000/health || exit 1
+          docker stop test-app
+          docker rm test-app
