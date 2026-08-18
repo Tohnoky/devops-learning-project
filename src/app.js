@@ -38,6 +38,13 @@ app.get('/api/info', (req, res) => {
   });
 });
 
+app.get('/api/time', (req, res) => {
+  res.json({
+    timestamp: new Date().toISOString(),
+    unix: Date.now()
+  });
+});
+
 // Запуск сервера
 if (require.main === module) {
   app.listen(PORT, () => {
