@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>DevOps Project - Docker Compose</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .container { background: #f0f8ff; padding: 30px; border-radius: 8px; }
+        button { background: #2196F3; color: white; border: none; padding: 10px 20px; margin: 5px; cursor: pointer; border-radius: 4px; }
+        pre { background: #263238; color: #aed581; padding: 15px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐳 Docker Compose Demo</h1>
+        <p>Эта страница отдаётся <strong>Nginx из контейнера</strong>.</p>
+        
+        <h2>Тест API через reverse proxy:</h2>
+        <button onclick="test('/')">GET /</button>
+        <button onclick="test('/health')">GET /health</button>
+        <button onclick="test('/api/info')">GET /api/info</button>
+        <button onclick="test('/api/time')">GET /api/time</button>
+        
+        <pre id="result">Результат появится здесь...</pre>
+    </div>
+
+    <script>
+        async function test(endpoint) {
+            const result = document.getElementById('result');
+            result.textContent = 'Загрузка...';
+            try {
+                const response = await fetch(endpoint);
+                const data = await response.json();
+                result.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.textContent = 'Ошибка: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

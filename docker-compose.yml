@@ -1,0 +1,46 @@
+services:
+  # Node.js приложение
+  app:
+    build: .                          # Собрать образ из Dockerfile в текущей папке
+    container_name: devops-app        # Имя контейнера
+    ports:
+      - "3000:3000"                   # Проброс порта
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - REDIS_HOST=redis        # ← имя сервиса Redis!
+      - REDIS_PORT=6379
+    depends_on:
+      - redis                    # app запустится после redis
+    restart: unless-stopped           # Перезапускать, если упал
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: devops-redis
+    ports:
+      - "6379:6379"              # Только для отладки, в проде не открывай
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: devops-nginx
+    ports:
+      - "80:80"                       # Внешний порт 80
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./public:/usr/share/nginx/html:ro
+    depends_on:
+      - app                           # Запустится после app
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
