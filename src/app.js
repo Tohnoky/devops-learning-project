@@ -26,6 +26,16 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Добавь после других app.get
+app.get('/api/info', (req, res) => {
+  res.json({
+    nodeVersion: process.version,
+    platform: process.platform,
+    arch: process.arch,
+    pid: process.pid
+  });
+});
+
 // Запуск сервера
 if (require.main === module) {
   app.listen(PORT, () => {

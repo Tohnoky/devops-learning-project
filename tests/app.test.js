@@ -19,4 +19,14 @@ describe('API Endpoints', () => {
       expect(res.body).toHaveProperty('uptime');
     });
   });
+
+  describe('GET /api/info', () => {
+    it('should return system information', async () => {
+      const res = await request(app).get('/api/info');
+      expect(res.statusCode).toBe(200);
+      expect(res.body).toHaveProperty('nodeVersion');
+      expect(res.body).toHaveProperty('platform');
+    });
+  });
 });
+
